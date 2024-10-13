@@ -8,6 +8,11 @@ import Home from './components/Home'; // Adjust based on your structure
 import Footer from './components/Footer';
 import About from './components/About'; // Import the About component
 import Contact from './components/Contact'; // Import the About component
+<<<<<<< HEAD
+import NannyList from './components/NannyList';
+import CartTotal from './components/CartTotal';
+=======
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
 function App() {
   return (
     <Router>
@@ -19,6 +24,11 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/about" element={<About />} /> {/* Add the About route */}
         <Route path="/contact" element={<Contact />} />
+<<<<<<< HEAD
+        <Route path='/nannylist' element={<NannyList />}/>
+        <Route path="/CartTotal" element={<CartTotal />}/>
+=======
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
       </Routes>
       <Footer />
     </Router>

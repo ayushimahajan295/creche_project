@@ -4,7 +4,11 @@ import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
 
 const Add = ({ token }) => {
+<<<<<<< HEAD
+    const [profilePicture, setProfilePicture] = useState(null);
+=======
   const [profilePicture, setProfilePicture] = useState(null);
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [age, setAge] = useState("");
@@ -35,12 +39,20 @@ const Add = ({ token }) => {
             }
 
             const response = await axios.post(backendUrl + "/api/nanny/add", formData, {
+<<<<<<< HEAD
+                headers: {
+                    Authorization: `Bearer ${token}`, // Ensure correct token format
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+=======
               headers: {
                 Authorization: `Bearer ${token}`, // Ensure correct token format
                 'Content-Type': 'multipart/form-data'
               }
             });
             
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
 
             if (response.data.success) {
                 toast.success(response.data.message);
@@ -51,7 +63,10 @@ const Add = ({ token }) => {
                 setAge("");
                 setExperience("");
                 setCertifications("");
+<<<<<<< HEAD
+=======
                 
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
                 setContactEmail("");
                 setContactPhone("");
                 setAddress("");
@@ -61,7 +76,18 @@ const Add = ({ token }) => {
 
         } catch (error) {
             console.log(error);
+<<<<<<< HEAD
+
+            // Check if the error is related to token expiration
+            if (error.response && error.response.status === 401) {
+                toast.error("Session expired. Please log in again.");
+                // Redirect to login or handle logout (implement this as needed)
+            } else {
+                toast.error(error.message);
+            }
+=======
             toast.error(error.message);
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
         } finally {
             setLoading(false); // Stop loading
         }
