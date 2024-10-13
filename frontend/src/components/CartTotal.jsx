@@ -1,37 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import './CartTotal.css'; // Importing the CSS file for styling
 
 const CartTotal = () => {
-  // Replace context with local state for demonstration
-  const [currency] = useState('$'); // Default currency set to USD
-  const [deliveryFee] = useState(5); // Sample delivery fee
-  const [cartAmount, setCartAmount] = useState(100); // Sample cart amount
+  const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios.post('http://localhost:5000/api/getcart');
+        setCartItems(response.data.cartItems);
+      } catch (error) {
+        console.error('Error fetching cart items:', error);
+      }
+    };
+
+    fetchCartItems();
+  }, []);
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + item.rate * item.hours, 0);
+  };
 
   return (
-    <div className='w-full'>
-      {/* Replacing Title with a simple header */}
-      <div className='text-2xl'>
-        <h2>
-          <span>CART </span>
-          <span>TOTALS</span>
-        </h2>
-      </div>
-
-      <div className='flex flex-col gap-2 mt-2 text-sm'>
-        <div className='flex justify-between'>
-          <p>Subtotal</p>
-          <p>{currency} {cartAmount}.00</p>
+    <div className="cart-container">
+      <h1 className="cart-title">Your Cart</h1>
+      {cartItems.length > 0 ? (
+        <div className="cart-items">
+          <ul>
+            {cartItems.map(item => (
+              <li key={item.nannyId} className="cart-item">
+                <div className="item-info">
+                  <h2>{item.firstName} {item.lastName}</h2>
+                  <p>Rate: ${item.rate} x {item.hours} hours</p>
+                </div>
+                <span className="item-total">Total: ${(item.rate * item.hours).toFixed(2)}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="cart-total">
+            <h2>Total Amount: ${calculateTotal().toFixed(2)}</h2>
+          </div>
         </div>
-        <hr />
-        <div className='flex justify-between'>
-          <p>Shipping Fee</p>
-          <p>{currency} {deliveryFee}.00</p>
-        </div>
-        <hr />
-        <div className='flex justify-between'>
-          <b>Total</b>
-          <b>{currency} {cartAmount === 0 ? 0 : cartAmount + deliveryFee}.00</b>
-        </div>
-      </div>
+      ) : (
+        <p className="empty-cart">Your cart is empty!</p>
+      )}
     </div>
   );
 };
