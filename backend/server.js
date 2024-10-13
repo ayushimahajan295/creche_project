@@ -4,10 +4,15 @@ import connectCloudinary from './config/cloudinary.js';
 import connectDB from './config/mongodb.js';
 import userRouter from './routes/userRoutes.js';
 import nannyRouter from './routes/nannyRoutes.js';
+<<<<<<< HEAD
 import mongoose from 'mongoose';
 import Nanny from './models/nannyModel.js';
 import dotenv from 'dotenv';
 import Cart from './models/CartModel.js';
+=======
+
+import dotenv from 'dotenv';
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
 dotenv.config();
 
 
@@ -28,6 +33,7 @@ app.get('/', (req, res) => {
 // Use user routes
 app.use('/api/user', userRouter); // Prefix all user routes with /api/users
 app.use('/api/nanny',nannyRouter);
+<<<<<<< HEAD
 app.get('/api/nannylist', async (req, res) => {
   try {
       const nannies = await Nanny.find(); // Fetch all nannies from MongoDB
@@ -69,6 +75,9 @@ app.post('/api/getcart', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+=======
+
+>>>>>>> 5022549007facf901d2234bae4b035eb969f7880
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
