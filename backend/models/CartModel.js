@@ -9,5 +9,6 @@ const cartSchema = new mongoose.Schema({
     rate: { type: Number, required: true },
 });
 
+
 const Cart = mongoose.model('Cart', cartSchema);
 export default Cart; // Ensure that this line exists

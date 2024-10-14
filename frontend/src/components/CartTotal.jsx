@@ -14,10 +14,10 @@ const CartTotal = () => {
         console.error('Error fetching cart items:', error);
       }
     };
-
     fetchCartItems();
   }, []);
 
+  
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.rate * item.hours, 0);
   };

@@ -8,10 +8,9 @@ const NannyList = () => {
   const [cart, setCart] = useState([]); 
 
   useEffect(() => {
-    // Fetch nannies
     const fetchNannies = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/nannylist');
+        const response = await axios.get('http://localhost:5000/api/nanny/list');
         setNannies(response.data.nannies); // Extract the nannies array from the response
       } catch (error) {
         console.error('Error fetching nannies:', error);
@@ -19,7 +18,6 @@ const NannyList = () => {
         setLoading(false);
       }
     };
-
     // Fetch cart from local storage
     const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
     setCart(savedCart);

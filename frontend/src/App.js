@@ -1,41 +1,49 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Product from './pages/Product';
+import Cart from './pages/Cart';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp'; // Import SignUp component
+import PlaceOrder from './pages/PlaceOrder';
+import Orders from './pages/Orders';
 import Navbar from './components/Navbar';
-import Login from './components/Login';
-import SignUp from './components/SignUp';
-import ForgotPassword from './components/ForgotPassword';
-import Home from './components/Home'; // Adjust based on your structure
 import Footer from './components/Footer';
-import About from './components/About'; // Import the About component
-import Contact from './components/Contact'; // Import the About component
-<<<<<<< HEAD
-import NannyList from './components/NannyList';
-import CartTotal from './components/CartTotal';
-=======
->>>>>>> 5022549007facf901d2234bae4b035eb969f7880
-function App() {
+import Verify from './pages/Verify';
+import OurPolicy from './components/OurPolicy'; // Import OurPolicy component
+import MyProfile from './pages/MyProfile';  // Import NannyList component
+import BabySitter from './pages/BabySitter';
+
+const App = () => {
   return (
-    <Router>
+    <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/about" element={<About />} /> {/* Add the About route */}
-        <Route path="/contact" element={<Contact />} />
-<<<<<<< HEAD
-        <Route path='/nannylist' element={<NannyList />}/>
-        <Route path="/CartTotal" element={<CartTotal />}/>
-=======
->>>>>>> 5022549007facf901d2234bae4b035eb969f7880
+        <Route path='/' element={<Home />} />
+        <Route path='/babysitter' element={<BabySitter />} /> {/* Updated route for NannyList */}
+        <Route path='/about' element={<About />} />
+        <Route path='/contact' element={<Contact />} />
+        <Route path='/babysitter/:id' element={<Product />} />
+        <Route path='/cart' element={<Cart />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/signup' element={<SignUp />} /> {/* Add SignUp route */}
+        <Route path='/place-order' element={<PlaceOrder />} />
+        <Route path='/orders' element={<Orders />} />
+        <Route path='/verify' element={<Verify />} />
+        <Route path='/profile' element={<MyProfile />} /> {/* Add MyProfile route */}
       </Routes>
+      <OurPolicy /> 
       <Footer />
-    </Router>
+    </div>
   );
-}
+};
 
 export default App;
+
+
+
 
 
 
