@@ -7,11 +7,11 @@ import Product from './pages/Product';
 import Cart from './pages/Cart';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp'; // Import SignUp component
-import PlaceOrder from './pages/PlaceOrder';
-import Orders from './pages/Orders';
+//import PlaceOrder from './pages/PlaceOrder';
+//import Orders from './pages/Orders';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Verify from './pages/Verify';
+//import Verify from './pages/Verify';
 import OurPolicy from './components/OurPolicy'; // Import OurPolicy component
 import MyProfile from './pages/MyProfile';  // Import NannyList component
 import BabySitter from './pages/BabySitter';
@@ -29,9 +29,9 @@ const App = () => {
         <Route path='/cart' element={<Cart />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<SignUp />} /> {/* Add SignUp route */}
-        <Route path='/place-order' element={<PlaceOrder />} />
-        <Route path='/orders' element={<Orders />} />
-        <Route path='/verify' element={<Verify />} />
+       {/*} <Route path='/place-order' element={<PlaceOrder />} />*/}
+        {/*<Route path='/orders' element={<Orders />} />*/}
+        {/*<Route path='/verify' element={<Verify />} />*/}
         <Route path='/profile' element={<MyProfile />} /> {/* Add MyProfile route */}
       </Routes>
       <OurPolicy /> 
