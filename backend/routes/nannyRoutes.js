@@ -17,7 +17,7 @@ nannyRouter.post('/add', upload.fields([{ name: 'profilePicture', maxCount: 1 }]
 nannyRouter.post('/list', listNannies); 
 
 // Route to get a single nanny by ID (no admin auth needed)
-nannyRouter.get('/:id', getNannyById); 
+nannyRouter.get('na/:id', getNannyById); 
 
 // Route to remove a nanny by ID (requires admin authentication)
 nannyRouter.delete('/remove/:id', removeNanny); 
