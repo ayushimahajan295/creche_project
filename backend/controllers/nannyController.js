@@ -1,12 +1,5 @@
 import Nanny from '../models/nannyModel.js'; // Adjust the path to your Nanny model
-import { v2 as cloudinary} from 'cloudinary';
 
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_SECRET_KEY,
-});
 
 // Function to add a new nanny
 export const addNanny = async (req, res) => {
@@ -18,7 +11,7 @@ export const addNanny = async (req, res) => {
         certifications,
         contactEmail,
         contactPhone,
-        address,
+        address
     } = req.body;
 
     try {
@@ -60,21 +53,18 @@ export const addNanny = async (req, res) => {
             }
         }
 
-        // Handle profile picture upload to Cloudinary
-        let profilePictureUrl;
-        if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path);
-            profilePictureUrl = result.secure_url; // Get the URL of the uploaded image
-        }
+        // Get the profile picture path
+// Get the profile picture path
+const profilePicturePath = req.file ? `uploads/${req.file.filename}` : null; // Use relative path
 
-        // Create a new nanny instance
+        // Create new nanny object
         const newNanny = new Nanny({
             firstName,
             lastName,
             age,
             experience,
             certifications: certificationsArray,
-            profilePicture: profilePictureUrl, // Use the Cloudinary URL
+            profilePicture: profilePicturePath, // Save file path
             contactEmail,
             contactPhone,
             address,
@@ -101,12 +91,20 @@ export const addNanny = async (req, res) => {
 export const listNannies = async (req, res) => {
     try {
         const nannies = await Nanny.find();
-        res.status(200).json({ success: true, nannies }); // Wrap nannies in an object
+        // Convert profilePicture path to a full URL
+        const nanniesWithImages = nannies.map(nanny => ({
+            ...nanny.toObject(),
+            profilePicture: `${req.protocol}://${req.get('host')}/public/${nanny.profilePicture}`, // Correct the path here
+        }));
+        res.status(200).json({ success: true, nannies: nanniesWithImages });
     } catch (error) {
         console.error('Error fetching nannies:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+
+
+
 
 
 // Function to get a single nanny by ID

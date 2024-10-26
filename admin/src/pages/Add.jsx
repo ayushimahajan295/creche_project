@@ -73,13 +73,14 @@ const Add = ({ token }) => {
     };
 
     return (
-        <form onSubmit={onSubmitHandler} className='flex flex-col w-full items-start gap-3'>
+        <form onSubmit={onSubmitHandler} className='flex flex-col w-full items-start gap-3' enctype="multipart/form-data"    >
             <div>
                 <p className='mb-2'>Profile Picture</p>
                 <input 
                     onChange={(e) => setProfilePicture(e.target.files[0])} 
                     type="file" 
                     accept="image/*" 
+                    name="file"
                     required 
                 />
             </div>

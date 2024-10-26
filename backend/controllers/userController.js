@@ -23,7 +23,7 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userID: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.status(200).json({ message: 'Login successful!', token });
   } catch (error) {
@@ -75,7 +75,9 @@ const signupUser = async (req, res) => {
     });
 
     await newUser.save();
-
+    const token = jwt.sign({ userID: newUser._id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(201).json({ message: 'User registered successfully!', token });
+    
     res.status(201).json({ message: 'User registered successfully!' });
   } catch (error) {
     console.error('Error during signup:', error);
