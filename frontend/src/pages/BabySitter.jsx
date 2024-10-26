@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'; // Import jwtDecode correctly
 
 const BabySitter = () => {
   const [nannies, setNannies] = useState([]);
@@ -33,13 +34,29 @@ const BabySitter = () => {
   }, []);
 
   const handleAddToCart = async (nanny) => {
+    const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
+
+    if (!token) {
+      alert('Please log in to add a nanny to your cart.');
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:5000/api/cart', {
-        nannyId: nanny._id, // Changed from babysitterId to nannyId
+      // Decode the token to get the userId
+      const decoded = jwtDecode(token); // Use jwtDecode
+      const userId = decoded.id; // Assuming your JWT contains userId as 'id'
+console.log(userId);
+      // Add the token to the headers for the request
+      await axios.post('http://localhost:5000/api/cart', { // Include userId in the request bod
+        nannyId: nanny._id,
         firstName: nanny.firstName,
         lastName: nanny.lastName,
         contactEmail: nanny.contactEmail,
         rate: nanny.rate || 500,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the header
+        },
       });
 
       const newCart = [...cart, nanny];
@@ -49,13 +66,10 @@ const BabySitter = () => {
     } catch (error) {
       console.error('Error adding nanny to cart:', error);
       if (error.response) {
-        // Server responded with a status other than 2xx
         alert(`Server Error: ${error.response.data.message || 'Failed to add to cart.'}`);
       } else if (error.request) {
-        // No response received
         alert('Network Error: Unable to reach the server.');
       } else {
-        // Other errors
         alert(`Error: ${error.message}`);
       }
     }

@@ -8,7 +8,19 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/cart');
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          console.error('No token found');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:5000/api/cart', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (response.data.cartItems) {
           setCartItems(response.data.cartItems);
         } else {
@@ -23,20 +35,23 @@ const Cart = () => {
 
     fetchCartItems();
   }, []);
-
+  
   const deleteCartItem = async (id) => {
     try {
-      console.log("Attempting to delete item with ID:", id); // Check the ID in the console
+      console.log("Attempting to delete item with ID:", id);
       await axios.delete(`http://localhost:5000/api/cart/${id}`);
-      setCartItems(cartItems.filter(item => item._id !== id)); // Update UI after deletion
+      setCartItems(cartItems.filter(item => item._id !== id));
     } catch (error) {
       console.error('Error deleting cart item:', error);
     }
   };
     
-
   const totalRate = () => {
     return cartItems.reduce((total, item) => total + item.rate, 0);
+  };
+
+  const handlePayment = () => {
+    console.log('Proceeding to payment...');
   };
 
   const containerStyle = {
@@ -80,6 +95,24 @@ const Cart = () => {
     marginTop: '50px',
   };
 
+  const payButtonStyle = {
+    display: 'inline-block',  // Changed to inline-block for smaller width
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    padding: '10px 20px',  // Adjust padding as needed
+    fontSize: '16px',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    marginTop: '20px',
+    textAlign: 'center',
+    transition: 'background-color 0.3s ease',
+  };
+
+  const payButtonHoverStyle = {
+    backgroundColor: '#45a049',
+  };
+
   if (loading) {
     return <div style={containerStyle}>Loading cart items...</div>;
   }
@@ -121,6 +154,14 @@ const Cart = () => {
           <div style={totalStyle}>
             Total Rate: ${totalRate().toFixed(2)}
           </div>
+          <button
+            onClick={handlePayment}
+            style={payButtonStyle}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = payButtonHoverStyle.backgroundColor}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = payButtonStyle.backgroundColor}
+          >
+            Pay
+          </button>
         </div>
       )}
     </div>

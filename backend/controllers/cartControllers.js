@@ -4,9 +4,10 @@ import Cart from '../models/CartModel.js'; // Adjust the path if necessary
 export const addCartItem = async (req, res) => {
   try {
     const { nannyId, firstName, lastName, contactEmail, rate } = req.body;
+    const userId = req.userId; // Now correctly aligned with middleware
 
-    // Create a new cart item
     const newCart = new Cart({
+      userId,
       nannyId,
       firstName,
       lastName,
@@ -14,7 +15,6 @@ export const addCartItem = async (req, res) => {
       rate,
     });
 
-    // Save the cart item to the database
     await newCart.save();
 
     res.status(201).json({ message: 'Nanny added to cart successfully!', newCart });
@@ -27,8 +27,11 @@ export const addCartItem = async (req, res) => {
 // Get cart items
 export const getCartItems = async (req, res) => {
   try {
-    // Fetch cart items from the database
-    const cartItems = await Cart.find(); // Add filtering criteria if needed
+    // Access userId from the authenticated user
+    const userId = req.userId; // Assuming the userId is set in the request by your authentication middleware
+console.log(userId);
+    // Fetch cart items for the specific user from the database
+    const cartItems = await Cart.find({ userId }); // Filter by userId to get the specific user's cart items
     res.status(200).json({ cartItems }); // Send the cart items as a response
   } catch (error) {
     console.error('Error fetching cart items:', error);
