@@ -8,7 +8,7 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/cart'); // Update with your API endpoint
+        const response = await axios.get('http://localhost:5000/api/cart');
         if (response.data.cartItems) {
           setCartItems(response.data.cartItems);
         } else {
@@ -23,6 +23,17 @@ const Cart = () => {
 
     fetchCartItems();
   }, []);
+
+  const deleteCartItem = async (id) => {
+    try {
+      console.log("Attempting to delete item with ID:", id); // Check the ID in the console
+      await axios.delete(`http://localhost:5000/api/cart/${id}`);
+      setCartItems(cartItems.filter(item => item._id !== id)); // Update UI after deletion
+    } catch (error) {
+      console.error('Error deleting cart item:', error);
+    }
+  };
+    
 
   const totalRate = () => {
     return cartItems.reduce((total, item) => total + item.rate, 0);
@@ -91,6 +102,20 @@ const Cart = () => {
               <span>
                 <strong>Rate:</strong> ${item.rate.toFixed(2)}
               </span>
+              <button
+                onClick={() => deleteCartItem(item._id)}
+                style={{
+                  backgroundColor: '#ff4d4d',
+                  color: 'white',
+                  border: 'none',
+                  padding: '5px 10px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  marginTop: '10px',
+                }}
+              >
+                Delete
+              </button>
             </div>
           ))}
           <div style={totalStyle}>

@@ -11,7 +11,7 @@ const BabySitter = () => {
   useEffect(() => {
     const fetchNannies = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/nanny/list');
+        const response = await axios.post('http://localhost:5000/api/nanny/list');
         if (response.data.success) {
           setNannies(response.data.nannies || []);
         } else {
