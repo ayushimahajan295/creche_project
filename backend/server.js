@@ -7,7 +7,10 @@ import nannyRouter from './routes/nannyRoutes.js';
 import cartRouter from './routes/cartRoutes.js'; // Import cart routes
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import Razorpay from 'razorpay';
+import crypto from 'crypto';
 
+// Load environment variables
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
@@ -19,20 +22,91 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+// Define Order Schema
+const OrderSchema = new mongoose.Schema({
+  razorpay_order_id: String,
+  razorpay_payment_id: String,
+  razorpay_signature: String,
+  status: String,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const Order = mongoose.model('Order', OrderSchema);
+
 // API endpoints
 app.get('/', (req, res) => {
   res.send("API working");
 });
 
-// Use user routes
+// Use user, nanny, and cart routes
 app.use('/api/user', userRouter);
 app.use('/api/nanny', nannyRouter);
 app.use('/api/cart', cartRouter); // Use cart routes
 
+// Create order endpoint
+app.post("/order", async (req, res) => {
+  try {
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_SECRET,
+    });
+
+    const options = req.body;
+    const order = await razorpay.orders.create(options);
+
+    if (!order) {
+      return res.status(500).send("Error creating order");
+    }
+
+    res.json(order);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error creating order");
+  }
+});
+
+// Validate payment endpoint
+app.post("/order/validate", async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+  // Validate the payment signature
+  const sha = crypto.createHmac("sha256", process.env.RAZORPAY_SECRET);
+  sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+  const digest = sha.digest("hex");
+
+  if (digest !== razorpay_signature) {
+    return res.status(400).json({ msg: "Transaction is not legit!" });
+  }
+
+  // Save order data to the database
+  try {
+    const newOrder = new Order({
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      status: "Success",
+    });
+
+    await newOrder.save();
+
+    res.json({
+      msg: "Payment successful and order saved to database",
+      orderId: razorpay_order_id,
+      paymentId: razorpay_payment_id,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: "Error saving order to database" });
+  }
+});
+
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
 
 
 

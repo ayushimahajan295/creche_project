@@ -40,9 +40,13 @@ const Cart = () => {
     try {
       console.log("Attempting to delete item with ID:", id);
       await axios.delete(`http://localhost:5000/api/cart/${id}`);
-      setCartItems(cartItems.filter(item => item._id !== id));
+      
+      // Update the cart items state after a successful deletion
+      setCartItems((prevItems) => prevItems.filter(item => item._id !== id));
+      alert("Item deleted successfully!"); // Optional: Provide feedback to the user
     } catch (error) {
       console.error('Error deleting cart item:', error);
+      alert("Failed to delete item. Please try again."); // Optional: Provide feedback on failure
     }
   };
     
@@ -50,82 +54,91 @@ const Cart = () => {
     return cartItems.reduce((total, item) => total + item.rate, 0);
   };
 
-  const handlePayment = () => {
-    console.log('Proceeding to payment...');
-  };
+  const handlePayment = async () => {
+    const amount = totalRate() * 100; // Convert to paise
+    const currency = "INR";
+    const receiptId = "receipt_1"; // Example receipt ID
 
-  const containerStyle = {
-    padding: '20px',
-    maxWidth: '600px',
-    margin: '0 auto',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '10px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-  };
+    try {
+      // Create order
+      const response = await fetch("http://localhost:5000/order", {
+        method: "POST",
+        body: JSON.stringify({
+          amount,
+          currency,
+          receipt: receiptId,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const order = await response.json();
 
-  const headerStyle = {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    marginBottom: '20px',
-    textAlign: 'center',
-    color: '#333',
-  };
+      // Configure Razorpay options
+      const options = {
+        key: "rzp_test_Y7J8yPZseC3NNh", // Replace with your test key
+        amount, // Razorpay expects the amount in paisa
+        currency,
+        name: "Creche Project ",
+        description: "pay for your order",
+        order_id: order.id, // Razorpay Order ID
+        handler: async (response) => {
+          const paymentDetails = {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            amount,
+            currency,
+            receipt: receiptId,
+          };
 
-  const itemStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    borderBottom: '1px solid #ddd',
-    padding: '10px 0',
-    fontSize: '18px',
-    color: '#555',
-  };
+          // Validate the payment and store it in the database
+          const validateRes = await fetch("http://localhost:5000/order/validate", {
+            method: "POST",
+            body: JSON.stringify(paymentDetails),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-  const totalStyle = {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    marginTop: '20px',
-    textAlign: 'right',
-    color: '#2d572c',
-  };
+          const jsonRes = await validateRes.json();
+          console.log("Payment Success:", jsonRes);
+          alert("Thank you for your payment!");
+        },
+        prefill: {
+          name: "John Doe",
+          email: "johndoe@example.com",
+          contact: "9999999999",
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
 
-  const emptyCartStyle = {
-    textAlign: 'center',
-    color: '#999',
-    fontSize: '18px',
-    marginTop: '50px',
-  };
-
-  const payButtonStyle = {
-    display: 'inline-block',  // Changed to inline-block for smaller width
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    padding: '10px 20px',  // Adjust padding as needed
-    fontSize: '16px',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginTop: '20px',
-    textAlign: 'center',
-    transition: 'background-color 0.3s ease',
-  };
-
-  const payButtonHoverStyle = {
-    backgroundColor: '#45a049',
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", (response) => {
+        console.error("Payment Failed:", response.error);
+        alert("Payment failed. Please try again.");
+      });
+      rzp.open();
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
   };
 
   if (loading) {
-    return <div style={containerStyle}>Loading cart items...</div>;
+    return <div className="p-5 max-w-lg mx-auto bg-gray-100 rounded-lg shadow-lg">Loading cart items...</div>;
   }
 
   return (
-    <div style={containerStyle}>
-      <h2 style={headerStyle}>Your Cart</h2>
+    <div className="p-5 max-w-lg mx-auto bg-gray-100 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-5 text-center text-gray-800">Your Cart</h2>
       {cartItems.length === 0 ? (
-        <p style={emptyCartStyle}>Your cart is empty</p>
+        <p className="text-center text-gray-400 text-lg mt-12">Your cart is empty</p>
       ) : (
         <div>
           {cartItems.map((item) => (
-            <div key={item._id} style={itemStyle}>
+            <div key={item._id} className="flex flex-col border-b border-gray-300 py-2">
               <span>
                 <strong>Name:</strong> {item.firstName} {item.lastName}
               </span>
@@ -137,28 +150,18 @@ const Cart = () => {
               </span>
               <button
                 onClick={() => deleteCartItem(item._id)}
-                style={{
-                  backgroundColor: '#ff4d4d',
-                  color: 'white',
-                  border: 'none',
-                  padding: '5px 10px',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
-                  marginTop: '10px',
-                }}
+                className="bg-red-500 text-white border-none py-1 px-2 rounded mt-2 cursor-pointer"
               >
                 Delete
               </button>
             </div>
           ))}
-          <div style={totalStyle}>
+          <div className="text-lg font-bold mt-5 text-right text-green-800">
             Total Rate: ${totalRate().toFixed(2)}
           </div>
           <button
             onClick={handlePayment}
-            style={payButtonStyle}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = payButtonHoverStyle.backgroundColor}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = payButtonStyle.backgroundColor}
+            className="inline-block bg-green-500 text-white py-2 px-4 text-lg rounded mt-5 cursor-pointer transition duration-300 ease-in-out hover:bg-green-600"
           >
             Pay
           </button>
@@ -169,3 +172,4 @@ const Cart = () => {
 };
 
 export default Cart;
+
