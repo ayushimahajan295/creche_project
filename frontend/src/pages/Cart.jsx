@@ -159,7 +159,8 @@ const Cart = () => {
               </span>
               <button
                 onClick={() => deleteCartItem(item._id)}
-                className="bg-red-500 text-white border-none py-1 px-2 rounded mt-2 cursor-pointer"
+                className="bg-black text-white border-none py-1 px-2 rounded mt-2 cursor-pointer"
+
               >
                 Delete
               </button>
@@ -170,7 +171,8 @@ const Cart = () => {
           </div>
           <button
             onClick={handlePayment}
-            className="inline-block bg-green-500 text-white py-2 px-4 text-lg rounded mt-5 cursor-pointer transition duration-300 ease-in-out hover:bg-green-600"
+            className="inline-block bg-black text-white py-2 px-4 text-lg rounded mt-5 cursor-pointer transition duration-300 ease-in-out hover:bg-gray-800"
+
           >
             Pay
           </button>
