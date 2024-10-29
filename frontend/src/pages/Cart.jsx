@@ -39,16 +39,25 @@ const Cart = () => {
   const deleteCartItem = async (id) => {
     try {
       console.log("Attempting to delete item with ID:", id);
-      await axios.delete(`http://localhost:5000/api/cart/${id}`);
       
-      // Update the cart items state after a successful deletion
-      setCartItems((prevItems) => prevItems.filter(item => item._id !== id));
-      alert("Item deleted successfully!"); // Optional: Provide feedback to the user
+      // Use the actual ID in the URL
+      const response = await axios.delete(`http://localhost:5000/api/cart/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`, // Include the token if required
+        },
+      });
+      
+      if (response.status === 200) {
+        // Update the cart items state after a successful deletion
+        setCartItems((prevItems) => prevItems.filter(item => item._id !== id));
+        alert("Item deleted successfully!"); // Provide feedback to the user
+      }
     } catch (error) {
       console.error('Error deleting cart item:', error);
-      alert("Failed to delete item. Please try again."); // Optional: Provide feedback on failure
+      alert(`Failed to delete item. Please try again. Error: ${error.response ? error.response.data.message : error.message}`);
     }
   };
+  
     
   const totalRate = () => {
     return cartItems.reduce((total, item) => total + item.rate, 0);
