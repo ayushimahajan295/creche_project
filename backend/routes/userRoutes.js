@@ -13,7 +13,7 @@ userRouter.post('/admin', adminLogin);
 // Get Profile Route - Protected by authenticate middleware
 userRouter.get('/profile', authenticate, async (req, res) => {
     try {
-        const userId = req.userID; // Use userID from authenticated request
+        const userId = req.user.userId; // Use userID from authenticated request
         const user = await User.findById(userId).select('username email phoneNumber aadharCard');
         
         if (!user) {
@@ -32,7 +32,7 @@ userRouter.put('/profile', authenticate, async (req, res) => {
     const { username, email, phoneNumber, aadharCard } = req.body;
 
     try {
-        const userId = req.userID; // Use userID from authenticated request
+        const userId = req.user.userId; // Use userID from authenticated request
         console.log(userId);
         const updatedUser = await User.findByIdAndUpdate(
             userId,

@@ -35,7 +35,7 @@ const BabySitter = () => {
 
   const handleAddToCart = async (nanny) => {
     const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
-
+console.log(token);
     if (!token) {
       alert('Please log in to add a nanny to your cart.');
       return;
@@ -66,11 +66,11 @@ console.log(userId);
     } catch (error) {
       console.error('Error adding nanny to cart:', error);
       if (error.response) {
-        alert(`Server Error: ${error.response.data.message || 'Failed to add to cart.'}`);
+        alert(`login first`);
       } else if (error.request) {
         alert('Network Error: Unable to reach the server.');
       } else {
-        alert(`Error: ${error.message}`);
+        alert(`please login before adding `);
       }
     }
   };

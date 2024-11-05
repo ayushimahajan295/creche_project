@@ -4,7 +4,7 @@ import Cart from '../models/CartModel.js'; // Adjust the path if necessary
 export const addCartItem = async (req, res) => {
   try {
     const { nannyId, firstName, lastName, contactEmail, rate } = req.body;
-    const userId = req.userId; // Get the authenticated user's ID
+    const userId = req.user.userId; // Get the authenticated user's ID
 
     const newCart = new Cart({
       userId,
@@ -26,7 +26,7 @@ export const addCartItem = async (req, res) => {
 // Get cart items
 export const getCartItems = async (req, res) => {
   try {
-    const userId = req.userId; // Get the authenticated user's ID
+    const userId = req.user.userId; // Get the authenticated user's ID
     const cartItems = await Cart.find({ userId }); // Fetch cart items for the user
 
     res.status(200).json({ cartItems }); // Send the cart items as a response
@@ -40,7 +40,7 @@ export const getCartItems = async (req, res) => {
 export const deleteCartItem = async (req, res) => {
   try {
     const { id } = req.params; // Get the item ID from the request parameters
-    const userId = req.userId; // Get the authenticated user's ID
+    const userId = req.user.userId; // Get the authenticated user's ID
 
     // Find and delete the cart item, ensuring it belongs to the user
     const cartItem = await Cart.findOneAndDelete({ _id: id, userId });

@@ -15,6 +15,7 @@ import Footer from './components/Footer';
 import OurPolicy from './components/OurPolicy'; // Import OurPolicy component
 import MyProfile from './pages/MyProfile';  // Import NannyList component
 import BabySitter from './pages/BabySitter';
+import PurchasedNannies from './pages/PurchasedNannies';
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
         {/*<Route path='/orders' element={<Orders />} />*/}
         {/*<Route path='/verify' element={<Verify />} />*/}
         <Route path='/profile' element={<MyProfile />} /> {/* Add MyProfile route */}
+        <Route path="/Purchased" element={<PurchasedNannies />}/>
       </Routes>
       <OurPolicy /> 
       <Footer />

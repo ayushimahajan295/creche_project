@@ -4,12 +4,14 @@ import connectCloudinary from './config/cloudinary.js';
 import connectDB from './config/mongodb.js';
 import userRouter from './routes/userRoutes.js';
 import nannyRouter from './routes/nannyRoutes.js';
-import cartRouter from './routes/cartRoutes.js'; // Import cart routes
+import cartRouter from './routes/cartRoutes.js'; 
+import authenticate from './middlewares/auth.js';
+//import PurchasedNanny from '../frontend/src/pages/PurchasedNannies.jsx';// Import cart routes
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-
+//import purchasedNanniesRoute from "./routes/PurchasedNanniesRoutes.js";
 // Load environment variables
 dotenv.config();
 
@@ -19,7 +21,11 @@ const app = express();
 connectCloudinary();
 connectDB();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from your frontend's URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+  credentials: true // If you need to send cookies with the request
+}));
 app.use(express.json());
 
 // Define Order Schema
@@ -36,7 +42,24 @@ const OrderSchema = new mongoose.Schema({
 
 const Order = mongoose.model('Order', OrderSchema);
 
+const PurchasedNannySchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", // Reference to the User model
+    required: true,
+  },
+  nannyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Nanny", // Reference to the Nanny model
+    required: true,
+  },
+  purchaseDate: {
+    type: Date,
+    default: Date.now,
+  },
+});
 // API endpoints
+export default mongoose.model("PurchasedNanny", PurchasedNannySchema);
 app.get('/', (req, res) => {
   res.send("API working");
 });
@@ -46,6 +69,9 @@ app.use('/api/user', userRouter);
 app.use('/api/nanny', nannyRouter);
 app.use('/api/cart', cartRouter); // Use cart routes
 
+// Get purchased nannies for the logged-in user
+
+//app.use("/api/purchased-nannies", purchasedNanniesRoute);
 // Create order endpoint
 app.post("/order", async (req, res) => {
   try {
