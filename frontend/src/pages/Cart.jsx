@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +22,7 @@ const Cart = () => {
         });
 
         if (response.data.cartItems) {
+          console.log(response.data.cartItems);
           setCartItems(response.data.cartItems);
         } else {
           console.error('No cart items found');
@@ -62,94 +62,98 @@ const Cart = () => {
   const handlePayment = async () => {
     const amount = totalRate() * 100; // Convert to paise for Razorpay
     const currency = "INR";
-    const receiptId = "receipt_1"; 
-
+    const receiptId = "receipt_1";
+  
     try {
-      const token = localStorage.getItem('token'); 
-      if (!token) {
-        alert("Token not found. Please log in to continue.");
-        return;
-      }
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("Token not found. Please log in to continue.");
+            return;
+        }
+  
+        // Gather all nannyId values from cart items
+        const nannyIds = cartItems.map((item) => item.nannyId);
+        console.log(nannyIds);
 
-      // Save each cart item in the PurchasedNanny collection
-      const purchasedNannyIds = await Promise.all(
-        cartItems.map(async (item) => {
-          console.log("Processing cart item:", item);
-          const response = await axios.post("http://localhost:5000/api/nanny/purchasednanny", 
-            { nannyId: item._id }, 
-            { headers: { "Authorization": `Bearer ${token}` } });
-          
-          if (response.status === 201) {
-            const purchasedNannyId = response.data.nannyId;
-            console.log("Purchased Nanny ID stored:", purchasedNannyId);
-            return purchasedNannyId;
-          } else {
-            throw new Error(`Failed to save nanny with ID ${item._id}`);
-          }
-        })
-      );
+        // Save all cart items in the PurchasedNanny collection in one request
+        const saveNanniesResponse = await axios.post(
+            "http://localhost:5000/api/nanny/purchasednanny",
+            { nannyIds },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-      setPurchasedNannyIds(purchasedNannyIds);
+        if (saveNanniesResponse.status === 201) {
+            console.log("Purchased Nanny IDs stored:", saveNanniesResponse.data.purchasedNannyIds);
+        } else {
+            throw new Error("Failed to save purchased nannies");
+        }
+  
+        // Create order in the backend
+        const orderResponse = await axios.post(
+            "http://localhost:5000/order",
+            { amount, currency, receipt: receiptId },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-      // Create order in the backend
-      const orderResponse = await axios.post("http://localhost:5000/order", 
-        { amount, currency, receipt: receiptId },
-        { headers: { "Authorization": `Bearer ${token}` } });
+        if (orderResponse.status !== 200) {
+            throw new Error("Failed to create order with Razorpay.");
+        }
+  
+        const order = orderResponse.data;
 
-      if (orderResponse.status !== 200) {
-        throw new Error("Failed to create order with Razorpay.");
-      }
-
-      const order = orderResponse.data;
-
-      const options = {
-        key: "rzp_test_Y7J8yPZseC3NNh",
-        amount,
-        currency,
-        name: "Creche Project",
-        description: "Pay for your order",
-        order_id: order.id,
-        handler: async (response) => {
-          const paymentDetails = {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
+        const options = {
+            key: "rzp_test_Y7J8yPZseC3NNh",
             amount,
             currency,
-            receipt: receiptId,
-          };
+            name: "Creche Project",
+            description: "Pay for your order",
+            order_id: order.id,
+            handler: async (response) => {
+                const paymentDetails = {
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                    amount,
+                    currency,
+                    receipt: receiptId,
+                };
 
-          // Validate payment
-          const validateRes = await axios.post("http://localhost:5000/order/validate", 
-            paymentDetails, 
-            { headers: { "Authorization": `Bearer ${token}` } });
+                // Validate payment
+                const validateRes = await axios.post(
+                    "http://localhost:5000/order/validate",
+                    paymentDetails,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-          console.log("Payment Success:", validateRes.data);
-          alert("Thank you for your payment!");
-          setCartItems([]); // Clear cart on successful payment
-          setPurchasedNannyIds([]); // Clear purchased nanny IDs after payment
-        },
-        prefill: {
-          name: "John Doe",
-          email: "johndoe@example.com",
-          contact: "9999999999",
-        },
-        theme: {
-          color: "#3399cc",
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", (response) => {
-        console.error("Payment Failed:", response.error);
-        alert("Payment failed. Please try again.");
-      });
-      rzp.open();
+                console.log("Payment Success:", validateRes.data);
+                alert("Thank you for your payment!");
+                
+                // Clear cart and purchased nanny IDs after payment
+                setCartItems([]); // Clear cart on successful payment
+                setPurchasedNannyIds([]); // Clear purchased nanny IDs after payment
+            },
+            prefill: {
+                name: "John Doe",
+                email: "johndoe@example.com",
+                contact: "9999999999",
+            },
+            theme: {
+                color: "#3399cc",
+            },
+        };
+  
+        const rzp = new window.Razorpay(options);
+        rzp.on("payment.failed", (response) => {
+            console.error("Payment Failed:", response.error);
+            alert("Payment failed. Please try again.");
+        });
+        rzp.open();
     } catch (error) {
-      console.error("Error creating order or saving purchased nannies:", error);
-      alert("An error occurred while processing your payment. Please try again.");
+        console.error("Error creating order or saving purchased nannies:", error);
+        alert("An error occurred while processing your payment. Please try again.");
     }
-  };
+};
+
 
   if (loading) {
     return <div className="p-5 max-w-lg mx-auto bg-gray-100 rounded-lg shadow-lg">Loading cart items...</div>;

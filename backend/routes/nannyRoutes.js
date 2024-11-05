@@ -64,21 +64,35 @@ nannyRouter.get('/user/purchased-nannies', authenticate, async (req, res) => {
 
 
 // Route to save purchased nanny
-nannyRouter.post('/purchasednanny', authenticate, async (req, res) => {
-  const { nannyId } = req.body;
-  const userId = req.user.userId;
-
-  try {
-      const newPurchasedNanny = new PurchasedNannies({
-          userId,
-          nannyId,
-      });
-      await newPurchasedNanny.save();
-      res.status(201).json({ message: 'Nanny purchased successfully.', nannyId: newPurchasedNanny.nannyId });
-  } catch (error) {
-      res.status(500).json({ message: 'Failed to save purchased nanny.' });
-  }
-});
+// Endpoint to save purchased nannies
+nannyRouter.post('/purchasednanny',authenticate, async (req, res) => {
+    try {
+      const { nannyIds } = req.body;
+  const userId=req.user.userId;
+      // Validate that nannyIds is an array
+      if (!Array.isArray(nannyIds) || nannyIds.length === 0) {
+        return res.status(400).json({ error: "nannyIds should be a non-empty array" });
+      }
+  
+      // Map each nannyId to a new PurchasedNanny document
+      const purchasedNannies = nannyIds.map((nannyId) => ({
+        nannyId,
+        userId,
+        purchaseDate: new Date(),
+      }));
+  
+      // Save all PurchasedNanny documents in one operation
+      const savedPurchasedNannies = await PurchasedNannies.insertMany(purchasedNannies);
+  
+      // Respond with the IDs of saved PurchasedNanny records
+      const purchasedNannyIds = savedPurchasedNannies.map((nanny) => nanny._id);
+      res.status(201).json({ purchasedNannyIds });
+    } catch (error) {
+      console.error("Error saving purchased nannies:", error);
+      res.status(500).json({ error: 'Failed to save purchased nannies' });
+    }
+  });
+  
 
 
 export default nannyRouter;
