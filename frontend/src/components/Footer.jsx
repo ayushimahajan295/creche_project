@@ -11,9 +11,8 @@ const Footer = () => {
               At Caring Nanny, we connect families with loving and qualified caregivers to ensure a safe and nurturing environment for your children.
             </p>
         </div>
-
         <div>
-            <p className='text-xl font-medium mb-5'>COMPANY</p>
+            <p className='text-xl font-medium mb-5'>COMPANY </p>
             <ul className='flex flex-col gap-1 text-gray-600'>
                 <NavLink to="/" className='hover:text-blue-500'>
                   <li>Home</li>

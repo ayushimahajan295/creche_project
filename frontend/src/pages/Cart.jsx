@@ -4,6 +4,7 @@ import axios from 'axios';
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [purchasedNannyIds, setPurchasedNannyIds] = useState([]); // Store purchased nanny IDs
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -38,50 +39,76 @@ const Cart = () => {
   
   const deleteCartItem = async (id) => {
     try {
-      console.log("Attempting to delete item with ID:", id);
-      await axios.delete(`http://localhost:5000/api/cart/${id}`);
+      const response = await axios.delete(`http://localhost:5000/api/cart/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
       
-      // Update the cart items state after a successful deletion
-      setCartItems((prevItems) => prevItems.filter(item => item._id !== id));
-      alert("Item deleted successfully!"); // Optional: Provide feedback to the user
+      if (response.status === 200) {
+        setCartItems((prevItems) => prevItems.filter(item => item._id !== id));
+        alert("Item deleted successfully!");
+      }
     } catch (error) {
       console.error('Error deleting cart item:', error);
-      alert("Failed to delete item. Please try again."); // Optional: Provide feedback on failure
+      alert(`Failed to delete item. Please try again. Error: ${error.response ? error.response.data.message : error.message}`);
     }
   };
-    
+  
   const totalRate = () => {
     return cartItems.reduce((total, item) => total + item.rate, 0);
   };
 
   const handlePayment = async () => {
-    const amount = totalRate() * 100; // Convert to paise
+    const amount = totalRate() * 100; // Convert to paise for Razorpay
     const currency = "INR";
-    const receiptId = "receipt_1"; // Example receipt ID
+    const receiptId = "receipt_1"; 
 
     try {
-      // Create order
-      const response = await fetch("http://localhost:5000/order", {
-        method: "POST",
-        body: JSON.stringify({
-          amount,
-          currency,
-          receipt: receiptId,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const order = await response.json();
+      const token = localStorage.getItem('token'); 
+      if (!token) {
+        alert("Token not found. Please log in to continue.");
+        return;
+      }
 
-      // Configure Razorpay options
+      // Save each cart item in the PurchasedNanny collection
+      const purchasedNannyIds = await Promise.all(
+        cartItems.map(async (item) => {
+          console.log("Processing cart item:", item);
+          const response = await axios.post("http://localhost:5000/api/nanny/purchasednanny", 
+            { nannyId: item._id }, 
+            { headers: { "Authorization": `Bearer ${token}` } });
+          
+          if (response.status === 201) {
+            const purchasedNannyId = response.data.nannyId;
+            console.log("Purchased Nanny ID stored:", purchasedNannyId);
+            return purchasedNannyId;
+          } else {
+            throw new Error(`Failed to save nanny with ID ${item._id}`);
+          }
+        })
+      );
+
+      setPurchasedNannyIds(purchasedNannyIds);
+
+      // Create order in the backend
+      const orderResponse = await axios.post("http://localhost:5000/order", 
+        { amount, currency, receipt: receiptId },
+        { headers: { "Authorization": `Bearer ${token}` } });
+
+      if (orderResponse.status !== 200) {
+        throw new Error("Failed to create order with Razorpay.");
+      }
+
+      const order = orderResponse.data;
+
       const options = {
-        key: "rzp_test_Y7J8yPZseC3NNh", // Replace with your test key
-        amount, // Razorpay expects the amount in paisa
+        key: "rzp_test_Y7J8yPZseC3NNh",
+        amount,
         currency,
-        name: "Creche Project ",
-        description: "pay for your order",
-        order_id: order.id, // Razorpay Order ID
+        name: "Creche Project",
+        description: "Pay for your order",
+        order_id: order.id,
         handler: async (response) => {
           const paymentDetails = {
             razorpay_order_id: response.razorpay_order_id,
@@ -92,18 +119,15 @@ const Cart = () => {
             receipt: receiptId,
           };
 
-          // Validate the payment and store it in the database
-          const validateRes = await fetch("http://localhost:5000/order/validate", {
-            method: "POST",
-            body: JSON.stringify(paymentDetails),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          // Validate payment
+          const validateRes = await axios.post("http://localhost:5000/order/validate", 
+            paymentDetails, 
+            { headers: { "Authorization": `Bearer ${token}` } });
 
-          const jsonRes = await validateRes.json();
-          console.log("Payment Success:", jsonRes);
+          console.log("Payment Success:", validateRes.data);
           alert("Thank you for your payment!");
+          setCartItems([]); // Clear cart on successful payment
+          setPurchasedNannyIds([]); // Clear purchased nanny IDs after payment
         },
         prefill: {
           name: "John Doe",
@@ -122,7 +146,8 @@ const Cart = () => {
       });
       rzp.open();
     } catch (error) {
-      console.error("Error creating order:", error);
+      console.error("Error creating order or saving purchased nannies:", error);
+      alert("An error occurred while processing your payment. Please try again.");
     }
   };
 
@@ -150,7 +175,7 @@ const Cart = () => {
               </span>
               <button
                 onClick={() => deleteCartItem(item._id)}
-                className="bg-red-500 text-white border-none py-1 px-2 rounded mt-2 cursor-pointer"
+                className="bg-black text-white border-none py-1 px-2 rounded mt-2 cursor-pointer"
               >
                 Delete
               </button>
@@ -161,7 +186,7 @@ const Cart = () => {
           </div>
           <button
             onClick={handlePayment}
-            className="inline-block bg-green-500 text-white py-2 px-4 text-lg rounded mt-5 cursor-pointer transition duration-300 ease-in-out hover:bg-green-600"
+            className="inline-block bg-black text-white py-2 px-4 text-lg rounded mt-5 cursor-pointer transition duration-300 ease-in-out hover:bg-gray-800"
           >
             Pay
           </button>
@@ -172,4 +197,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

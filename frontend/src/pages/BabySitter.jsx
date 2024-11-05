@@ -35,7 +35,7 @@ const BabySitter = () => {
 
   const handleAddToCart = async (nanny) => {
     const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
-
+console.log(token);
     if (!token) {
       alert('Please log in to add a nanny to your cart.');
       return;
@@ -103,7 +103,8 @@ console.log(userId);
                 <p className="text-gray-600">Rate: ${nanny.rate} / hour</p>
               </div>
               <button
-                className="w-full bg-green-500 text-white py-2 rounded-b-lg hover:bg-green-600"
+                className="w-full bg-black text-white py-2 rounded-b-lg hover:bg-green-600"
+
                 onClick={() => handleAddToCart(nanny)}
               >
                 Add to Cart

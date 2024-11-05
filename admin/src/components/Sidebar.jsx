@@ -20,6 +20,14 @@ const Sidebar = () => {
                     
                     <p className='hidden md:block'>List Nanny</p>
                 </NavLink>
+
+                <NavLink 
+                    className='flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-2 rounded-l' 
+                    to="/orders"
+                >
+                    
+                    <p className='hidden md:block'>Orders</p>
+                </NavLink>
             </div>
         </div>
     );
