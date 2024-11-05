@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'; // Import Link for routing
 
 const About = () => {
   return (
-    <div className='flex flex-col items-center my-10 bg-gradient-to-b from-indigo-200 to-white py-10'>
+    <div className='flex flex-col items-center my-10 bg-gradient-to-b from-yellow-200 via-indigo-200 to-white py-10'>
       {/* About Section Card */}
       <div className='border rounded-lg shadow-lg p-8 my-6 md:w-3/4 lg:w-1/2 bg-white transition-transform transform hover:scale-105 hover:shadow-2xl'>
         <p className='text-gray-700 leading-relaxed'>
