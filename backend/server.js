@@ -6,11 +6,16 @@ import userRouter from './routes/userRoutes.js';
 import nannyRouter from './routes/nannyRoutes.js';
 import cartRouter from './routes/cartRoutes.js'; 
 import authenticate from './middlewares/auth.js';
+import path from 'path';
+import multer from 'multer';
+import { fileURLToPath } from 'url';
 //import PurchasedNanny from '../frontend/src/pages/PurchasedNannies.jsx';// Import cart routes
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+import cloudinary from './config/cloudinary.js'; // Cloudinary config
+import imageRouter from './routes/imageRoutes.js'; // Your new image routes
 //import purchasedNanniesRoute from "./routes/PurchasedNanniesRoutes.js";
 // Load environment variables
 dotenv.config();
@@ -20,6 +25,8 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 connectCloudinary();
 connectDB();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors({
   origin: [
@@ -31,7 +38,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
+app.use('/public', express.static(path.join(__dirname, 'public')));
 // Define Order Schema
 const OrderSchema = new mongoose.Schema({
   razorpay_order_id: String,
@@ -67,12 +74,37 @@ export default mongoose.model("PurchasedNanny", PurchasedNannySchema);
 app.get('/', (req, res) => {
   res.send("API working");
 });
+app.use('/backend/admin/public', express.static(path.join(__dirname, 'public')));
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      // Save files to the 'public/uploads' directory
+      cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+      // Set the filename as the original name
+      cb(null, file.originalname);
+  },
+});
+
+// Initialize upload
+const upload = multer({ storage });
+app.use('/api/images', imageRouter);
 // Use user, nanny, and cart routes
 app.use('/api/user', userRouter);
 app.use('/api/nanny', nannyRouter);
 app.use('/api/cart', cartRouter); // Use cart routes
-
+app.get('/api/image/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, 'public', 'uploads', filename);
+  
+  res.sendFile(imagePath, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(err.status).end();
+    }
+  });
+});
 // Get purchased nannies for the logged-in user
 
 //app.use("/api/purchased-nannies", purchasedNanniesRoute);
