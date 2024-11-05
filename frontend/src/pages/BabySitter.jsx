@@ -34,20 +34,26 @@ const BabySitter = () => {
   }, []);
 
   const handleAddToCart = async (nanny) => {
-    const token = localStorage.getItem('token'); // Assuming the token is stored in local storage
-console.log(token);
+    const token = localStorage.getItem('token');
     if (!token) {
       alert('Please log in to add a nanny to your cart.');
       return;
     }
 
+    // Check if the nanny is already in the cart
+    const isNannyInCart = cart.some(item => item._id === nanny._id);
+    if (isNannyInCart) {
+      alert(`${nanny.firstName} ${nanny.lastName} is already in your cart!`);
+      return;
+    }
+
     try {
       // Decode the token to get the userId
-      const decoded = jwtDecode(token); // Use jwtDecode
-      const userId = decoded.id; // Assuming your JWT contains userId as 'id'
-console.log(userId);
-      // Add the token to the headers for the request
-      await axios.post('http://localhost:5000/api/cart', { // Include userId in the request bod
+      const decoded = jwtDecode(token);
+      const userId = decoded.id;
+
+      // Add the nanny to the cart
+      await axios.post('http://localhost:5000/api/cart', {
         nannyId: nanny._id,
         firstName: nanny.firstName,
         lastName: nanny.lastName,
@@ -55,7 +61,7 @@ console.log(userId);
         rate: nanny.rate || 500,
       }, {
         headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the header
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -66,11 +72,11 @@ console.log(userId);
     } catch (error) {
       console.error('Error adding nanny to cart:', error);
       if (error.response) {
-        alert(`login first`);
+        alert(`Error: ${error.response.data.message}`);
       } else if (error.request) {
         alert('Network Error: Unable to reach the server.');
       } else {
-        alert(`please login before adding `);
+        alert(`An unexpected error occurred.`);
       }
     }
   };
@@ -104,7 +110,6 @@ console.log(userId);
               </div>
               <button
                 className="w-full bg-black text-white py-2 rounded-b-lg hover:bg-green-600"
-
                 onClick={() => handleAddToCart(nanny)}
               >
                 Add to Cart
@@ -117,4 +122,4 @@ console.log(userId);
   );
 };
 
-export default BabySitter;
+export default BabySitter; 
