@@ -22,10 +22,14 @@ connectCloudinary();
 connectDB();
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow requests from your frontend's URL
+  origin: [
+    'http://localhost:3000', // Existing frontend
+    'http://localhost:5174'  // New frontend
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
   credentials: true // If you need to send cookies with the request
 }));
+
 app.use(express.json());
 
 // Define Order Schema
