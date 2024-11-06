@@ -2,6 +2,7 @@ import express from 'express';
 import upload from '../middlewares/multer.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Appointment from '../models/Appointment.js';
 import Nanny from '../models/nannyModel.js';// Adjust the path based on your project structure
 import authenticate from '../middlewares/auth.js';
 import PurchasedNannies from '../models/PurchasedNannies.js';
@@ -62,6 +63,41 @@ nannyRouter.get('/user/purchased-nannies', authenticate, async (req, res) => {
   }
 });
 
+nannyRouter.post('/book-appointment', authenticate, async (req, res) => {
+    const { nannyId } = req.body; // Extract nannyId from request body
+    const userId = req.user.userId; // Assuming the user ID is available in the request after token verification
+    const userLocation = req.body.location || "Default Location"; // Get user location from request, if necessary
+    const meetingTime = new Date(); // Set your desired meeting time (you can pass this from the request if needed)
+
+    try {
+        // Find the nanny in the database
+        const nanny = await Nanny.findById(nannyId);
+        if (!nanny) {
+            return res.status(404).json({ message: 'Nanny not found' });
+        }
+
+        // Create a new appointment
+        const appointment = new Appointment({
+            nannyId,
+            userId,
+            location: userLocation,
+            meetingTime: meetingTime,
+        });
+
+        // Save the appointment to the database
+        await appointment.save();
+
+        // Respond with the nanny details
+        res.status(200).json({
+            message: 'Appointment booked successfully',
+            nannyName: nanny.name, // Adjust the property based on your Nanny model
+            nannyPhone: nanny.phone, // Assuming you have a phone field in your Nanny model
+        });
+    } catch (error) {
+        console.error('Error booking appointment:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 // Route to save purchased nanny
 // Endpoint to save purchased nannies
