@@ -52,7 +52,7 @@ const Contact = () => {
           <FaEnvelope className="text-3xl text-gray-700" />
           <div>
             <p className="font-semibold">E-mail ID</p>
-            <p className="text-gray-600">support@caringconnect.com</p>
+            <p className="text-gray-600">support@caringnanny.com</p>
           </div>
         </motion.div>
 

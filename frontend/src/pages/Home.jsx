@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 
-import { FaUserNurse, FaClock, FaBabyCarriage, FaHome, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUserNurse, FaClock, FaBabyCarriage, FaHome, FaExclamationTriangle, FaChild } from 'react-icons/fa';
 import { gsap } from 'gsap';
 
 const Home = () => {
@@ -48,13 +48,13 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            Welcome to Caring Connect
+            Welcome to Caring Nanny
           </motion.h1>
 
-          {/* Description of Caring Connect */}
+          {/* Description of Caring Nanny */}
           <div className="text-lg font-medium text-indigo-600">
             <p>
-              Caring Connect is a trusted platform that connects families with experienced and
+              Caring Nanny is a trusted platform that connects families with experienced and
               reliable caregivers. Whether you need a full-time nanny, part-time help, or occasional
               babysitting services, we’ve got you covered.
             </p>
@@ -103,7 +103,8 @@ const Home = () => {
             { title: "Part-Time Nanny", description: "Flexible part-time nanny services.", icon: <FaClock size={40} /> },
             { title: "Occasional Babysitting", description: "Reliable babysitters for occasional needs.", icon: <FaBabyCarriage size={40} /> },
             { title: "Overnight Care", description: "Overnight nanny services for extended hours.", icon: <FaHome size={40} /> },
-            { title: "Emergency Childcare", description: "Immediate childcare support in case of emergencies.", icon: <FaExclamationTriangle size={40} /> }
+            { title: "Emergency Childcare", description: "Immediate childcare support in case of emergencies.", icon: <FaExclamationTriangle size={40} /> },
+            { title: "Special Needs Care", description: "Experienced nannies for children with special needs, offering dedicated and compassionate care.", icon: <FaChild size={40} /> }
           ].map((service, index) => (
             <motion.div
               key={index}
@@ -134,8 +135,8 @@ const Home = () => {
         <h2 className="text-3xl font-bold text-indigo-700 mb-8">Frequently Asked Questions</h2>
         <div className="space-y-6 px-10 md:px-20 max-w-3xl mx-auto">
           {[ 
-            { question: "What is Caring Connect?", answer: "A platform connecting families with trusted nannies." },
-            { question: "How does the vetting process work?", answer: "Thorough background checks and interviews." },
+            { question: "What is Caring Nanny?", answer: "A platform connecting families with trusted nannies." },
+            { question: "How does the vetting process work?", answer: "Through background checks and interviews." },
             { question: "Can I book a part-time nanny?", answer: "Yes, based on your schedule." },
             { question: "What is the cancellation policy?", answer: "Flexible cancellation with advance notice." },
             { question: "How do I contact customer support?", answer: "Available 24/7 via website or helpline." }

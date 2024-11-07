@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link for routing
 
 const About = () => {
   return (
@@ -7,7 +6,7 @@ const About = () => {
       {/* About Section Card */}
       <div className='border rounded-lg shadow-lg p-8 my-6 md:w-3/4 lg:w-1/2 bg-white transition-transform transform hover:scale-105 hover:shadow-2xl'>
         <p className='text-gray-700 leading-relaxed'>
-          At <span className='font-bold text-indigo-600'>Caring Nannies</span>, we understand that choosing the right caregiver for your children is one of the most important decisions a parent can make. Our journey began with a mission to provide families with trustworthy and nurturing nannies who prioritize the well-being and development of your little ones.
+          At <span className='font-bold text-indigo-600'>Caring Nanny</span>, we understand that choosing the right caregiver for your children is one of the most important decisions a parent can make. Our journey began with a mission to provide families with trustworthy and nurturing nannies who prioritize the well-being and development of your little ones.
         </p>
         <p className='text-gray-700 leading-relaxed mt-4'>
           Since our inception, we've dedicated ourselves to connecting families with highly qualified nannies who offer a wide range of services tailored to meet the unique needs of each family. From daily care to specialized activities, we ensure that our caregivers are not only skilled but also passionate about what they do.
@@ -17,7 +16,7 @@ const About = () => {
       {/* Our Mission Card */}
       <div className='border rounded-lg shadow-lg p-8 my-6 md:w-3/4 lg:w-1/2 bg-white transition-transform transform hover:scale-105 hover:shadow-2xl'>
         <b className='text-indigo-600 text-xl'>Our Mission</b>
-        <p className='text-gray-600 mt-2'>At Caring Nannies, our mission is to empower families by providing reliable and compassionate childcare solutions. We strive to create lasting relationships between families and nannies, ensuring peace of mind for parents and a safe, loving environment for children.</p>
+        <p className='text-gray-600 mt-2'>At Caring Nanny, our mission is to empower families by providing reliable and compassionate childcare solutions. We strive to create lasting relationships between families and nannies, ensuring peace of mind for parents and a safe, loving environment for children.</p>
       </div>
 
       {/* Why Choose Us Section */}

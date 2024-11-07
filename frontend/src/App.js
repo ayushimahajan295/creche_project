@@ -15,7 +15,6 @@ import MyProfile from './pages/MyProfile';  // Import MyProfile component
 import BabySitter from './pages/BabySitter';
 import PurchasedNannies from './pages/PurchasedNannies';
 import ChatBot from './pages/ChatBot';
-import axios from 'axios';
 
 const App = () => {
   return (
