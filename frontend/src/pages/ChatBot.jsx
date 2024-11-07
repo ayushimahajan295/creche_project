@@ -34,6 +34,22 @@ const ChatBot = () => {
       <div className="w-full max-w-2xl p-6 space-y-6">
         <h1 className="text-center text-4xl font-bold text-gray-800 mb-4">Chatbot</h1>
 
+        {/* Categories Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-6">
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <span className="text-blue-500">💡</span> General knowledge
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <span className="text-blue-500">🔧</span> Technical questions
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <span className="text-blue-500">📝</span> Writing assistance
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <span className="text-blue-500">🤔</span> Problem solving
+          </div>
+        </div>
+
         {/* Display question and answer */}
         <div className="space-y-4">
           <div>
