@@ -85,7 +85,7 @@ const NannyBot = () => {
 
     // Default response if no matches found
     if (!reply) {
-      reply = "👋 Hello! I'm your nanny management assistant. I can help you with:\n\n• Finding and booking nannies\n• Understanding care services\n• Answering questions about nanny availability\n\nPlease visit www.caringnanny.com or contact us at support@caringnanny.com for more information!";
+      reply = "👋 Hello! I'm your caring nanny assistant. I can help you with:\n\n• Finding and booking nannies\n• Understanding care services\n• Answering questions about nanny availability\n\nPlease visit www.caringnanny.com or contact us at support@caringnanny.com for more information!";
     }
 
     setMessages((prev) => [...prev, { type: 'bot', content: reply }]);
@@ -125,7 +125,7 @@ const NannyBot = () => {
     <div className="fixed bottom-4 right-4 w-96 h-[600px] bg-white rounded-lg shadow-xl flex flex-col z-50">
       <div className="bg-indigo-700 p-4 rounded-t-lg flex justify-between items-center">
         <div className="text-white">
-          <h2 className="font-semibold">Nanny Management Assistant</h2>
+          <h2 className="font-semibold">Caring Nanny Assistant</h2>
           <p className="text-sm opacity-75">Here to assist with nanny services</p>
         </div>
         <button
