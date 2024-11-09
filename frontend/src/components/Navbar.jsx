@@ -62,11 +62,7 @@ const Navbar = () => {
           <img src={cartIcon} className='w-5 min-w-5' alt="Cart" />
         </Link>
 
-        {/* Chatbot Button on the right */}
-        <NavLink to='/chatbot' className='flex items-center gap-2 py-2 px-4 border rounded-lg bg-blue-500 text-white'>
-          <p className='text-sm'>CHATBOT</p>
-        </NavLink>
-
+       
         <img onClick={() => setVisible(true)} src={menuIcon} className='w-5 cursor-pointer sm:hidden' alt="Menu" />
       </div>
 
